@@ -27,10 +27,10 @@ export function NewProjectDialog({ clientId, open, onOpenChange }: NewProjectDia
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="!max-w-[calc(100%-3rem)] sm:!max-w-2xl max-h-[90vh] overflow-y-auto !p-4 sm:!p-6">
+        <DialogHeader className="pb-3 sm:pb-4">
+          <DialogTitle className="text-lg sm:text-xl">Create New Project</DialogTitle>
+          <DialogDescription className="text-sm">
             Create a new project to organize your tasks
           </DialogDescription>
         </DialogHeader>

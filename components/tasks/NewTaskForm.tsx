@@ -86,7 +86,7 @@ export function NewTaskForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5">
       {!projectId ? (
         <div className="space-y-2">
           <Label htmlFor="project_id">Project *</Label>
@@ -96,7 +96,7 @@ export function NewTaskForm({
             rules={{ required: 'Please select a project' }}
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger>
+                <SelectTrigger className={errors.project_id ? 'border-red-500 focus-visible:ring-red-500' : ''}>
                   <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
                 <SelectContent>
@@ -110,35 +110,36 @@ export function NewTaskForm({
             )}
           />
           {errors.project_id && (
-            <p className="text-sm text-destructive">{errors.project_id.message}</p>
+            <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium">{errors.project_id.message}</p>
           )}
         </div>
       ) : (
-        <div className="rounded-md bg-muted p-3">
-          <Label className="text-sm text-muted-foreground">Project</Label>
-          <p className="text-sm font-medium text-foreground">{projects[0]?.name}</p>
+        <div className="rounded-md bg-muted/50 p-3 border border-border">
+          <Label className="text-xs sm:text-sm text-muted-foreground">Project</Label>
+          <p className="text-sm sm:text-base font-medium text-foreground mt-1">{projects[0]?.name}</p>
         </div>
       )}
       <div className="space-y-2">
-        <Label htmlFor="title">Task Title *</Label>
+        <Label htmlFor="title" className="text-sm font-medium">Task Title *</Label>
         <Input
           id="title"
           {...register('title')}
           placeholder="Create Instagram post for product launch"
+          className={`h-10 sm:h-11 ${errors.title ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
         />
         {errors.title && (
-          <p className="text-sm text-destructive">{errors.title.message}</p>
+          <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium">{errors.title.message}</p>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="content_type">Content Type *</Label>
+          <Label htmlFor="content_type" className="text-sm font-medium">Content Type *</Label>
           <Controller
             name="content_type"
             control={control}
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger>
+                <SelectTrigger className={`w-full ${errors.content_type ? 'border-red-500 focus-visible:ring-red-500' : ''}`}>
                   <SelectValue placeholder="Select content type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -152,17 +153,17 @@ export function NewTaskForm({
             )}
           />
           {errors.content_type && (
-            <p className="text-sm text-destructive">{errors.content_type.message}</p>
+            <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium">{errors.content_type.message}</p>
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="platform">Platform *</Label>
+          <Label htmlFor="platform" className="text-sm font-medium">Platform *</Label>
           <Controller
             name="platform"
             control={control}
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger>
+                <SelectTrigger className={`w-full ${errors.platform ? 'border-red-500 focus-visible:ring-red-500' : ''}`}>
                   <SelectValue placeholder="Select platform" />
                 </SelectTrigger>
                 <SelectContent>
@@ -176,13 +177,13 @@ export function NewTaskForm({
             )}
           />
           {errors.platform && (
-            <p className="text-sm text-destructive">{errors.platform.message}</p>
+            <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium">{errors.platform.message}</p>
           )}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="duration_seconds">Duration</Label>
+          <Label htmlFor="duration_seconds" className="text-sm font-medium">Duration</Label>
           <Controller
             name="duration_seconds"
             control={control}
@@ -191,7 +192,7 @@ export function NewTaskForm({
                 onValueChange={(value) => field.onChange(value === 'none' ? null : parseInt(value))} 
                 value={field.value?.toString() || 'none'}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select duration (optional)" />
                 </SelectTrigger>
                 <SelectContent>
@@ -207,7 +208,7 @@ export function NewTaskForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="dimensions">Dimensions</Label>
+          <Label htmlFor="dimensions" className="text-sm font-medium">Dimensions</Label>
           <Controller
             name="dimensions"
             control={control}
@@ -216,7 +217,7 @@ export function NewTaskForm({
                 onValueChange={(value) => field.onChange(value === 'none' ? null : value)} 
                 value={field.value || 'none'}
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select dimensions (optional)" />
                 </SelectTrigger>
                 <SelectContent>
@@ -233,24 +234,29 @@ export function NewTaskForm({
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="brief">Brief *</Label>
+        <Label htmlFor="brief" className="text-sm font-medium">Brief *</Label>
         <Textarea
           id="brief"
           {...register('brief')}
           placeholder="Describe what you need..."
-          rows={6}
+          rows={5}
+          className={`min-h-[120px] resize-y ${errors.brief ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
         />
         {errors.brief && (
-          <p className="text-sm text-destructive">{errors.brief.message}</p>
+          <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium">{errors.brief.message}</p>
         )}
       </div>
       {error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+        <div className="rounded-md bg-red-50 dark:bg-red-950/30 p-3 text-xs sm:text-sm text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 font-medium">
           {error}
         </div>
       )}
-      <div className="flex gap-4">
-        <Button type="submit" disabled={loading}>
+      <div className="flex flex-col sm:flex-row gap-3 pt-2">
+        <Button 
+          type="submit" 
+          disabled={loading}
+          className="w-full sm:w-auto order-2 sm:order-1"
+        >
           {loading ? 'Creating...' : 'Create Task'}
         </Button>
         <Button
@@ -260,6 +266,7 @@ export function NewTaskForm({
             reset()
             onCancel?.()
           }}
+          className="w-full sm:w-auto order-1 sm:order-2"
         >
           Cancel
         </Button>

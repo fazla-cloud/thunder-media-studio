@@ -63,37 +63,43 @@ export function NewProjectForm({ clientId, onSuccess, onCancel }: NewProjectForm
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="name">Project Name *</Label>
+        <Label htmlFor="name" className="text-sm font-medium">Project Name *</Label>
         <Input
           id="name"
           {...register('name')}
           placeholder="My Marketing Campaign"
+          className={`h-10 sm:h-11 ${errors.name ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
         />
         {errors.name && (
-          <p className="text-sm text-destructive">{errors.name.message}</p>
+          <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium">{errors.name.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description" className="text-sm font-medium">Description</Label>
         <Textarea
           id="description"
           {...register('description')}
           placeholder="Describe your project..."
           rows={4}
+          className={`min-h-[100px] resize-y ${errors.description ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
         />
         {errors.description && (
-          <p className="text-sm text-destructive">{errors.description.message}</p>
+          <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 font-medium">{errors.description.message}</p>
         )}
       </div>
       {error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+        <div className="rounded-md bg-red-50 dark:bg-red-950/30 p-3 text-xs sm:text-sm text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 font-medium">
           {error}
         </div>
       )}
-      <div className="flex gap-4">
-        <Button type="submit" disabled={loading}>
+      <div className="flex flex-col sm:flex-row gap-3 pt-2">
+        <Button 
+          type="submit" 
+          disabled={loading}
+          className="w-full sm:w-auto order-2 sm:order-1"
+        >
           {loading ? 'Creating...' : 'Create Project'}
         </Button>
         <Button
@@ -103,6 +109,7 @@ export function NewProjectForm({ clientId, onSuccess, onCancel }: NewProjectForm
             reset()
             onCancel?.()
           }}
+          className="w-full sm:w-auto order-1 sm:order-2"
         >
           Cancel
         </Button>

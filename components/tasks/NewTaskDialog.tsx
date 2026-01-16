@@ -93,10 +93,10 @@ export function NewTaskDialog({
   if (loading) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Create New Task</DialogTitle>
-            <DialogDescription>Loading...</DialogDescription>
+        <DialogContent className="!max-w-[calc(100%-3rem)] sm:!max-w-2xl !p-4 sm:!p-6">
+          <DialogHeader className="pb-3 sm:pb-4">
+            <DialogTitle className="text-lg sm:text-xl">Create New Task</DialogTitle>
+            <DialogDescription className="text-sm">Loading...</DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>
@@ -106,10 +106,10 @@ export function NewTaskDialog({
   if (!projectId && (!projects || projects.length === 0)) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Create New Task</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="!max-w-[calc(100%-3rem)] sm:!max-w-2xl !p-4 sm:!p-6">
+          <DialogHeader className="pb-3 sm:pb-4">
+            <DialogTitle className="text-lg sm:text-xl">Create New Task</DialogTitle>
+            <DialogDescription className="text-sm">
               You need to create a project first before creating tasks.
             </DialogDescription>
           </DialogHeader>
@@ -120,10 +120,10 @@ export function NewTaskDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Create New Task</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="!max-w-[calc(100%-3rem)] sm:!max-w-2xl max-h-[90vh] overflow-y-auto !p-4 sm:!p-6">
+        <DialogHeader className="pb-3 sm:pb-4">
+          <DialogTitle className="text-lg sm:text-xl">Create New Task</DialogTitle>
+          <DialogDescription className="text-sm">
             {projectId 
               ? `Create a new task for this project`
               : 'Create a new task and select a project'
