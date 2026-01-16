@@ -79,7 +79,7 @@ export function Sidebar({ role }: SidebarProps) {
     <div className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar">
       <Link href="/dashboard" className="flex h-16 items-center gap-3 border-b border-sidebar-border px-6 hover:bg-sidebar-accent/10 transition-colors">
         <Image
-          src="/thunder-logo.png"
+          src="/thunder-logo.svg"
           alt="Thunder Logo"
           width={28}
           height={28}

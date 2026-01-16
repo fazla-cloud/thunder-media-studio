@@ -17,9 +17,9 @@ export const metadata: Metadata = {
   title: "Thunder (Marketing Agency Platform)",
   description: "Subscription-based marketing agency platform",
   icons: {
-    icon: '/thunder-logo.png',
-    shortcut: '/thunder-logo.png',
-    apple: '/thunder-logo.png',
+    icon: '/thunder-logo.svg',
+    shortcut: '/thunder-logo.svg',
+    apple: '/thunder-logo.svg',
   },
 };
 
