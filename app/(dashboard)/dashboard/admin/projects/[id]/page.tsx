@@ -34,12 +34,18 @@ export default async function AdminProjectDetailPage({
     redirect('/dashboard/admin/projects')
   }
 
+  // Type the project explicitly
+  const typedProject = project as Database['public']['Tables']['projects']['Row']
+
   // Get client name
   const { data: clientProfile } = await supabase
     .from('profiles')
     .select('full_name')
-    .eq('id', project.client_id)
+    .eq('id', typedProject.client_id)
     .single()
+
+  type ClientProfile = Database['public']['Tables']['profiles']['Row']
+  const typedClientProfile: Pick<ClientProfile, 'full_name'> | null = clientProfile as Pick<ClientProfile, 'full_name'> | null
 
   // Get tasks for this project
   const { data: tasks, error: tasksError } = await supabase
@@ -48,15 +54,23 @@ export default async function AdminProjectDetailPage({
     .eq('project_id', id)
     .order('created_at', { ascending: false })
 
+  // Type for tasks with profile relations
+  type TaskWithProfiles = Database['public']['Tables']['tasks']['Row'] & {
+    assigned_profile?: { id: string; full_name: string | null; avatar_url: string | null } | null
+    client_profile?: { id: string; full_name: string | null; avatar_url: string | null } | null
+  }
+
   // Fetch assigned and client profiles separately and merge with tasks
-  let tasksWithProfiles = tasks || []
+  let tasksWithProfiles: TaskWithProfiles[] = []
   if (tasks && tasks.length > 0) {
+    const typedTasks = tasks as Database['public']['Tables']['tasks']['Row'][]
+    
     // Get unique assigned and client user IDs
-    const assignedIds = [...new Set(tasks.map((t: any) => t.assigned_to).filter(Boolean))]
-    const clientIds = [...new Set(tasks.map((t: any) => t.client_id).filter(Boolean))]
+    const assignedIds = [...new Set(typedTasks.map(t => t.assigned_to).filter(Boolean) as string[])]
+    const clientIds = [...new Set(typedTasks.map(t => t.client_id).filter(Boolean) as string[])]
     
     // Fetch assigned profiles
-    let assignedProfilesMap = new Map()
+    let assignedProfilesMap = new Map<string, { id: string; full_name: string | null; avatar_url: string | null }>()
     if (assignedIds.length > 0) {
       const { data: assignedProfiles } = await supabase
         .from('profiles')
@@ -64,14 +78,15 @@ export default async function AdminProjectDetailPage({
         .in('id', assignedIds)
 
       if (assignedProfiles) {
+        const typedProfiles = assignedProfiles as Database['public']['Tables']['profiles']['Row'][]
         assignedProfilesMap = new Map(
-          assignedProfiles.map((p: any) => [p.id, { id: p.id, full_name: p.full_name, avatar_url: p.avatar_url }])
+          typedProfiles.map((p) => [p.id, { id: p.id, full_name: p.full_name, avatar_url: p.avatar_url }])
         )
       }
     }
 
     // Fetch client profiles
-    let clientProfilesMap = new Map()
+    let clientProfilesMap = new Map<string, { id: string; full_name: string | null; avatar_url: string | null }>()
     if (clientIds.length > 0) {
       const { data: clientProfiles } = await supabase
         .from('profiles')
@@ -79,17 +94,18 @@ export default async function AdminProjectDetailPage({
         .in('id', clientIds)
 
       if (clientProfiles) {
+        const typedClientProfiles = clientProfiles as Database['public']['Tables']['profiles']['Row'][]
         clientProfilesMap = new Map(
-          clientProfiles.map((p: any) => [p.id, { id: p.id, full_name: p.full_name, avatar_url: p.avatar_url }])
+          typedClientProfiles.map((p) => [p.id, { id: p.id, full_name: p.full_name, avatar_url: p.avatar_url }])
         )
       }
     }
 
     // Merge profiles with tasks
-    tasksWithProfiles = tasks.map((task: any) => ({
+    tasksWithProfiles = typedTasks.map((task) => ({
       ...task,
-      assigned_profile: task.assigned_to ? assignedProfilesMap.get(task.assigned_to) || null : null,
-      client_profile: task.client_id ? clientProfilesMap.get(task.client_id) || null : null,
+      assigned_profile: task.assigned_to ? (assignedProfilesMap.get(task.assigned_to) || null) : null,
+      client_profile: task.client_id ? (clientProfilesMap.get(task.client_id) || null) : null,
     }))
   }
 
@@ -105,21 +121,21 @@ export default async function AdminProjectDetailPage({
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
             <EditableProjectName
-              projectId={project.id}
-              initialName={project.name}
+              projectId={typedProject.id}
+              initialName={typedProject.name}
               className="text-3xl font-semibold tracking-tight text-foreground"
             />
             <div className="mt-2 flex items-center gap-4">
-              <StatusBadge status={project.status} />
+              <StatusBadge status={typedProject.status} />
               <span className="text-sm text-muted-foreground">
-                Client: {clientProfile?.full_name || 'Unknown'}
+                Client: {typedClientProfile?.full_name || 'Unknown'}
               </span>
               <span className="text-sm text-muted-foreground">
-                Created: {new Date(project.created_at).toLocaleDateString()}
+                Created: {new Date(typedProject.created_at).toLocaleDateString()}
               </span>
             </div>
-            {project.description && (
-              <p className="mt-4 text-muted-foreground">{project.description}</p>
+            {typedProject.description && (
+              <p className="mt-4 text-muted-foreground">{typedProject.description}</p>
             )}
           </div>
         </div>
@@ -140,22 +156,22 @@ export default async function AdminProjectDetailPage({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
             <StatusCard 
               label="Drafts" 
-              count={tasksWithProfiles.filter((t: any) => t.status === 'drafts').length} 
+              count={tasksWithProfiles.filter(t => t.status === 'drafts').length} 
               icon={FileEdit} 
             />
             <StatusCard 
               label="In Progress" 
-              count={tasksWithProfiles.filter((t: any) => t.status === 'in_progress').length} 
+              count={tasksWithProfiles.filter(t => t.status === 'in_progress').length} 
               icon={PlayCircle} 
             />
             <StatusCard 
               label="Completed" 
-              count={tasksWithProfiles.filter((t: any) => t.status === 'completed').length} 
+              count={tasksWithProfiles.filter(t => t.status === 'completed').length} 
               icon={CheckCircle2} 
             />
             <StatusCard 
               label="Archived" 
-              count={tasksWithProfiles.filter((t: any) => t.status === 'archived').length} 
+              count={tasksWithProfiles.filter(t => t.status === 'archived').length} 
               icon={Archive} 
             />
           </div>
@@ -171,7 +187,7 @@ export default async function AdminProjectDetailPage({
       </div>
 
       <TaskListWithTabs
-        tasks={(tasksWithProfiles as Array<Database['public']['Tables']['tasks']['Row'] & { assigned_profile?: { id: string; full_name: string | null; avatar_url: string | null } | null; client_profile?: { id: string; full_name: string | null; avatar_url: string | null } | null }>) || []}
+        tasks={tasksWithProfiles}
         isAdmin={true}
         searchQuery={searchParamsData.search}
         dateFrom={searchParamsData.dateFrom}

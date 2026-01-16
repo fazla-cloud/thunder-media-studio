@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { Check, X, Pencil } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { Database } from '@/types/database'
 
 interface EditableProjectNameProps {
   projectId: string
@@ -36,9 +37,10 @@ export function EditableProjectName({ projectId, initialName, className }: Edita
     setError(null)
 
     try {
-      const { error: updateError } = await supabase
-        .from('projects')
-        .update({ name: name.trim() })
+      const updateData: Database['public']['Tables']['projects']['Update'] = { name: name.trim() }
+      const { error: updateError } = await (supabase
+        .from('projects') as any)
+        .update(updateData)
         .eq('id', projectId)
 
       if (updateError) throw updateError

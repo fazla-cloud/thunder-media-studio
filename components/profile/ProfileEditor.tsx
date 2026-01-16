@@ -138,9 +138,10 @@ export function ProfileEditor({ profile, userEmail }: ProfileEditorProps) {
       if (uploadError) throw uploadError
 
       // Update profile with new avatar URL
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: filePath })
+      const updateData: Database['public']['Tables']['profiles']['Update'] = { avatar_url: filePath }
+      const { error: updateError } = await (supabase
+        .from('profiles') as any)
+        .update(updateData)
         .eq('id', profile.id)
 
       if (updateError) throw updateError
@@ -173,9 +174,10 @@ export function ProfileEditor({ profile, userEmail }: ProfileEditorProps) {
       if (deleteError) throw deleteError
 
       // Update profile to remove avatar_url
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: null })
+      const updateData2: Database['public']['Tables']['profiles']['Update'] = { avatar_url: null }
+      const { error: updateError } = await (supabase
+        .from('profiles') as any)
+        .update(updateData2)
         .eq('id', profile.id)
 
       if (updateError) throw updateError
@@ -199,12 +201,13 @@ export function ProfileEditor({ profile, userEmail }: ProfileEditorProps) {
 
     try {
       const supabase = createClient()
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          full_name: data.full_name,
-          title: data.title || null,
-        })
+      const updateData3: Database['public']['Tables']['profiles']['Update'] = {
+        full_name: data.full_name,
+        title: data.title || null,
+      }
+      const { error: updateError } = await (supabase
+        .from('profiles') as any)
+        .update(updateData3)
         .eq('id', profile.id)
 
       if (updateError) throw updateError

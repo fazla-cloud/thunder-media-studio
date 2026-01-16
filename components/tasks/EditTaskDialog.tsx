@@ -67,8 +67,9 @@ export function EditTaskDialog({ open, onOpenChange, taskId, initialTask }: Edit
           .order('full_name')
 
         if (profiles) {
-          setDesigners(profiles.filter(p => p.role === 'designer'))
-          setMarketers(profiles.filter(p => p.role === 'marketer'))
+          const typedProfiles = profiles as Database['public']['Tables']['profiles']['Row'][]
+          setDesigners(typedProfiles.filter(p => p.role === 'designer'))
+          setMarketers(typedProfiles.filter(p => p.role === 'marketer'))
         }
       }
       fetchData()

@@ -26,7 +26,14 @@ export default async function MarketerDashboard() {
     console.error('Error fetching tasks:', error)
   }
 
-  const assignedTasks = tasks || []
+  // Type the tasks explicitly
+  type TaskWithRelations = Database['public']['Tables']['tasks']['Row'] & {
+    projects?: { name: string }
+    assigned_profile?: { id: string; full_name: string | null; avatar_url: string | null } | null
+    client_profile?: { id: string; full_name: string | null; avatar_url: string | null } | null
+  }
+
+  const assignedTasks = (tasks || []) as TaskWithRelations[]
   const totalTasks = assignedTasks.length
   const inProgressTasks = assignedTasks.filter(t => t.status === 'in_progress').length
   const completedTasks = assignedTasks.filter(t => t.status === 'completed').length
@@ -71,7 +78,7 @@ export default async function MarketerDashboard() {
       <div className="mb-6">
         <h2 className="text-2xl font-semibold text-foreground mb-4">My Assigned Tasks</h2>
         <TaskListWithTabs
-          tasks={(assignedTasks as Array<Database['public']['Tables']['tasks']['Row'] & { projects: { name: string } }>)}
+          tasks={assignedTasks}
           showProject={true}
         />
       </div>

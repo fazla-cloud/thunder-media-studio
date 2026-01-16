@@ -44,7 +44,7 @@ export interface Database {
           client_id: string
           name: string
           description: string | null
-          status: string
+          status: 'active' | 'completed' | 'archived'
           created_at: string
         }
         Insert: {
@@ -52,7 +52,7 @@ export interface Database {
           client_id: string
           name: string
           description?: string | null
-          status?: string
+          status?: 'active' | 'completed' | 'archived'
           created_at?: string
         }
         Update: {
@@ -60,7 +60,7 @@ export interface Database {
           client_id?: string
           name?: string
           description?: string | null
-          status?: string
+          status?: 'active' | 'completed' | 'archived'
           created_at?: string
         }
       }
@@ -75,7 +75,7 @@ export interface Database {
           duration_seconds: number | null
           dimensions: string | null
           brief: string
-          status: 'new' | 'accepted' | 'in_progress' | 'completed'
+          status: 'drafts' | 'in_progress' | 'completed' | 'archived'
           assigned_to: string | null
           created_at: string
         }
@@ -89,7 +89,7 @@ export interface Database {
           duration_seconds?: number | null
           dimensions?: string | null
           brief: string
-          status?: 'new' | 'accepted' | 'in_progress' | 'completed'
+          status?: 'drafts' | 'in_progress' | 'completed' | 'archived'
           assigned_to?: string | null
           created_at?: string
         }
@@ -103,7 +103,7 @@ export interface Database {
           duration_seconds?: number | null
           dimensions?: string | null
           brief?: string
-          status?: 'new' | 'accepted' | 'in_progress' | 'completed'
+          status?: 'drafts' | 'in_progress' | 'completed' | 'archived'
           assigned_to?: string | null
           created_at?: string
         }

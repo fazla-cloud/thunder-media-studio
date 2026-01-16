@@ -71,12 +71,14 @@ export function UsersManager({ initialUsers }: UsersManagerProps) {
     setLoading(userId)
     try {
       const supabase = createClient()
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          role: editData.role as any,
-          title: editData.title || null,
-        })
+      const updatePayload: Database['public']['Tables']['profiles']['Update'] = {
+        role: editData.role as Database['public']['Tables']['profiles']['Row']['role'],
+        title: editData.title || null,
+      }
+      
+      const { error } = await (supabase
+        .from('profiles') as any)
+        .update(updatePayload)
         .eq('id', userId)
 
       if (error) throw error

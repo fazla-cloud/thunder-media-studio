@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { NewTaskForm } from './NewTaskForm'
+import { Database } from '@/types/database'
 
 interface NewTaskDialogProps {
   clientId: string
@@ -50,10 +51,13 @@ export function NewTaskDialog({
         .eq('client_id', clientId)
         .order('name')
 
+      // Type projects explicitly
+      const typedProjects = (projectsData || []) as Pick<Database['public']['Tables']['projects']['Row'], 'id' | 'name'>[]
+
       // If projectId is provided, use that project
-      const projectsList = projectId && projectsData
-        ? projectsData.filter(p => p.id === projectId)
-        : projectsData || []
+      const projectsList = projectId && typedProjects.length > 0
+        ? typedProjects.filter(p => p.id === projectId)
+        : typedProjects
 
       // Get all options for selects
       const [contentTypesRes, platformsRes, durationsRes, dimensionsRes] = await Promise.all([
@@ -63,11 +67,17 @@ export function NewTaskDialog({
         supabase.from('dimensions').select('id, label, value').order('label'),
       ])
 
+      // Type all options explicitly
+      const typedContentTypes = (contentTypesRes.data || []) as Database['public']['Tables']['content_types']['Row'][]
+      const typedPlatforms = (platformsRes.data || []) as Database['public']['Tables']['platforms']['Row'][]
+      const typedDurations = (durationsRes.data || []) as Database['public']['Tables']['durations']['Row'][]
+      const typedDimensions = (dimensionsRes.data || []) as Database['public']['Tables']['dimensions']['Row'][]
+
       setProjects(projectsList)
-      setContentTypes(contentTypesRes.data || [])
-      setPlatforms(platformsRes.data || [])
-      setDurations(durationsRes.data || [])
-      setDimensions(dimensionsRes.data || [])
+      setContentTypes(typedContentTypes)
+      setPlatforms(typedPlatforms)
+      setDurations(typedDurations)
+      setDimensions(typedDimensions)
     } catch (error) {
       console.error('Error loading form data:', error)
     } finally {

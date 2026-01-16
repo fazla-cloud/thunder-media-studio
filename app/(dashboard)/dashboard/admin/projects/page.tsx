@@ -24,22 +24,25 @@ export default async function AdminProjectsPage({
     .select('*')
     .order('created_at', { ascending: false })
 
+  if (error) {
+    console.error('Error fetching projects:', error)
+  }
+
+  // Type the projects explicitly
+  const typedProjects = (projects || []) as Database['public']['Tables']['projects']['Row'][]
+
   // Get client names
-  const clientIds = (projects as Array<{ client_id: string }>)?.map(p => p.client_id) || []
+  const clientIds = typedProjects.map(p => p.client_id)
   const { data: profiles } = await supabase
     .from('profiles')
     .select('id, full_name')
     .in('id', clientIds)
 
-  const clientMap = new Map((profiles as Array<{ id: string; full_name: string | null }>)?.map(p => [p.id, p.full_name]) || [])
-
-
-  if (error) {
-    console.error('Error fetching projects:', error)
-  }
+  const typedProfiles = (profiles || []) as Database['public']['Tables']['profiles']['Row'][]
+  const clientMap = new Map(typedProfiles.map(p => [p.id, p.full_name]))
 
   // Filter projects by status if needed
-  let filteredProjects = projects || []
+  let filteredProjects = typedProjects
   if (statusFilter !== 'all') {
     filteredProjects = filteredProjects.filter(
       (p) => p.status === statusFilter
@@ -70,7 +73,7 @@ export default async function AdminProjectsPage({
   }
 
   // Add client names and tasks to projects for the card component
-  const projectsWithClient = (filteredProjects as Array<Database['public']['Tables']['projects']['Row']>).map(project => ({
+  const projectsWithClient = filteredProjects.map(project => ({
     ...project,
     clientName: clientMap.get(project.client_id) || 'Unknown',
   }))
@@ -91,7 +94,7 @@ export default async function AdminProjectsPage({
 
       <AdminProjectsList 
         projects={projectsWithClient}
-        allProjects={projects as Array<Database['public']['Tables']['projects']['Row']> || []}
+        allProjects={typedProjects}
         initialStatus={statusFilter}
         clientMap={clientMap}
       />

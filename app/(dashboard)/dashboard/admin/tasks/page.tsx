@@ -16,7 +16,9 @@ import { Edit } from 'lucide-react'
 import { EditTaskDialog } from '@/components/tasks/EditTaskDialog'
 import { Database } from '@/types/database'
 
-type Task = Database['public']['Tables']['tasks']['Row']
+type Task = Database['public']['Tables']['tasks']['Row'] & {
+  assigned_profile?: { id: string; full_name: string | null; avatar_url: string | null } | null
+}
 
 export default function AdminTasksPage() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -38,11 +40,14 @@ export default function AdminTasksPage() {
     if (tasksError) {
       console.error('Error fetching tasks:', tasksError)
     } else if (tasksData) {
+      // Type tasks explicitly
+      const typedTasks = tasksData as Database['public']['Tables']['tasks']['Row'][]
+      
       // Get unique assigned user IDs
-      const assignedIds = [...new Set(tasksData.map((t: any) => t.assigned_to).filter(Boolean))]
+      const assignedIds = [...new Set(typedTasks.map(t => t.assigned_to).filter(Boolean) as string[])]
       
       // Fetch assigned profiles
-      let assignedProfilesMap = new Map()
+      let assignedProfilesMap = new Map<string, { id: string; full_name: string | null; avatar_url: string | null }>()
       if (assignedIds.length > 0) {
         const { data: assignedProfiles } = await supabase
           .from('profiles')
@@ -50,19 +55,25 @@ export default function AdminTasksPage() {
           .in('id', assignedIds)
 
         if (assignedProfiles) {
+          const typedProfiles = assignedProfiles as Database['public']['Tables']['profiles']['Row'][]
           assignedProfilesMap = new Map(
-            assignedProfiles.map(p => [p.id, { id: p.id, full_name: p.full_name, avatar_url: p.avatar_url }])
+            typedProfiles.map(p => [p.id, { id: p.id, full_name: p.full_name, avatar_url: p.avatar_url }])
           )
         }
       }
 
+      // Type for tasks with profile relations
+      type TaskWithProfile = Database['public']['Tables']['tasks']['Row'] & {
+        assigned_profile?: { id: string; full_name: string | null; avatar_url: string | null } | null
+      }
+
       // Merge assigned profiles with tasks
-      const tasksWithProfiles = tasksData.map((task: any) => ({
+      const tasksWithProfiles: TaskWithProfile[] = typedTasks.map((task) => ({
         ...task,
-        assigned_profile: task.assigned_to ? assignedProfilesMap.get(task.assigned_to) || null : null,
+        assigned_profile: task.assigned_to ? (assignedProfilesMap.get(task.assigned_to) || null) : null,
       }))
 
-      setTasks(tasksWithProfiles as any)
+      setTasks(tasksWithProfiles)
 
       // Get project and client IDs
       const projectIds = tasksData.map((t: any) => t.project_id)
@@ -75,8 +86,9 @@ export default function AdminTasksPage() {
         .in('id', projectIds)
 
       if (projectsData) {
+        const typedProjects = projectsData as Database['public']['Tables']['projects']['Row'][]
         const projectMap = new Map(
-          projectsData.map(p => [p.id, p.name])
+          typedProjects.map(p => [p.id, p.name])
         )
         setProjects(projectMap)
       }
@@ -88,8 +100,9 @@ export default function AdminTasksPage() {
         .in('id', clientIds)
 
       if (clientsData) {
+        const typedClients = clientsData as Database['public']['Tables']['profiles']['Row'][]
         const clientMap = new Map(
-          clientsData.map(c => [c.id, c.full_name])
+          typedClients.map(c => [c.id, c.full_name])
         )
         setClients(clientMap)
       }

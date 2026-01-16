@@ -109,7 +109,7 @@ export function QuickActions({ role, clientId }: QuickActionsProps) {
                   key={action.title}
                   variant="outline"
                   className="w-full h-auto flex-col items-start justify-start p-4 hover:bg-accent transition-all duration-200"
-                  onClick={() => handleAction(action.action)}
+                  onClick={() => 'action' in action && handleAction(action.action)}
                 >
                   <div className="flex items-center gap-3 w-full">
                     <Icon className="h-5 w-5 shrink-0" />

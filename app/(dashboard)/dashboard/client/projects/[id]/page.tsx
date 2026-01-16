@@ -38,6 +38,9 @@ export default async function ProjectDetailPage({
     redirect('/dashboard/client/projects')
   }
 
+  // Type the project explicitly
+  const typedProject = project as Database['public']['Tables']['projects']['Row']
+
   // Get tasks for this project
   const { data: tasks, error: tasksError } = await supabase
     .from('tasks')
@@ -46,11 +49,18 @@ export default async function ProjectDetailPage({
     .eq('client_id', profile.id)
     .order('created_at', { ascending: false })
 
+  // Type for tasks with profile relations
+  type TaskWithProfiles = Database['public']['Tables']['tasks']['Row'] & {
+    assigned_profile?: { id: string; full_name: string | null; avatar_url: string | null } | null
+  }
+
   // Fetch assigned profiles separately and merge with tasks
-  let tasksWithProfiles = tasks || []
+  let tasksWithProfiles: TaskWithProfiles[] = []
   if (tasks && tasks.length > 0) {
+    const typedTasks = tasks as Database['public']['Tables']['tasks']['Row'][]
+    
     // Get unique assigned user IDs (including null checks)
-    const assignedIds = [...new Set(tasks.map((t: any) => t.assigned_to).filter((id: any) => id !== null && id !== undefined && id !== ''))]
+    const assignedIds = [...new Set(typedTasks.map(t => t.assigned_to).filter(Boolean) as string[])]
     
     if (assignedIds.length > 0) {
       // Fetch assigned profiles
@@ -64,26 +74,27 @@ export default async function ProjectDetailPage({
       }
 
       if (assignedProfiles && assignedProfiles.length > 0) {
+        const typedProfiles = assignedProfiles as Database['public']['Tables']['profiles']['Row'][]
         const assignedProfilesMap = new Map(
-          assignedProfiles.map((p: any) => [p.id, { id: p.id, full_name: p.full_name, avatar_url: p.avatar_url }])
+          typedProfiles.map((p) => [p.id, { id: p.id, full_name: p.full_name, avatar_url: p.avatar_url }])
         )
 
         // Merge assigned profiles with tasks
-        tasksWithProfiles = tasks.map((task: any) => ({
+        tasksWithProfiles = typedTasks.map((task) => ({
           ...task,
           assigned_profile: task.assigned_to ? (assignedProfilesMap.get(task.assigned_to) || null) : null,
         }))
       } else {
         // If no profiles found but tasks have assigned_to, log for debugging
         console.warn('Tasks have assigned_to but profiles not found:', assignedIds)
-        tasksWithProfiles = tasks.map((task: any) => ({
+        tasksWithProfiles = typedTasks.map((task) => ({
           ...task,
           assigned_profile: null,
         }))
       }
     } else {
       // No assigned tasks, but ensure structure is correct
-      tasksWithProfiles = tasks.map((task: any) => ({
+      tasksWithProfiles = typedTasks.map((task) => ({
         ...task,
         assigned_profile: null,
       }))
@@ -119,15 +130,15 @@ export default async function ProjectDetailPage({
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <EditableProjectName
-                projectId={project.id}
-                initialName={project.name}
+                projectId={typedProject.id}
+                initialName={typedProject.name}
                 className="text-2xl font-semibold tracking-tight mb-2"
               />
               <div className="flex items-center gap-3 mt-2">
-                <StatusBadge status={project.status} />
+                <StatusBadge status={typedProject.status} />
                 <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                   <Calendar className="h-3.5 w-3.5" />
-                  <span>Created {new Date(project.created_at).toLocaleDateString('en-US', { 
+                  <span>Created {new Date(typedProject.created_at).toLocaleDateString('en-US', { 
                     month: 'long', 
                     day: 'numeric', 
                     year: 'numeric' 
@@ -138,11 +149,11 @@ export default async function ProjectDetailPage({
             <NewTaskButton clientId={profile.id} projectId={id} />
           </div>
         </CardHeader>
-        {project.description && (
+        {typedProject.description && (
           <CardContent>
             <div className="flex items-start gap-2">
               <FileText className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-              <p className="text-sm text-muted-foreground leading-relaxed">{project.description}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{typedProject.description}</p>
             </div>
           </CardContent>
         )}

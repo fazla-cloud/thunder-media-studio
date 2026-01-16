@@ -54,8 +54,9 @@ export function AssignTaskDialog({ open, onOpenChange, taskId, projectId }: Assi
           .order('full_name')
 
         if (profiles) {
-          setDesigners(profiles.filter(p => p.role === 'designer'))
-          setMarketers(profiles.filter(p => p.role === 'marketer'))
+          const typedProfiles = profiles as Database['public']['Tables']['profiles']['Row'][]
+          setDesigners(typedProfiles.filter(p => p.role === 'designer'))
+          setMarketers(typedProfiles.filter(p => p.role === 'marketer'))
         }
 
         // Fetch task title
@@ -66,7 +67,8 @@ export function AssignTaskDialog({ open, onOpenChange, taskId, projectId }: Assi
           .single()
 
         if (task) {
-          setTaskTitle(task.title)
+          const typedTask = task as Pick<Database['public']['Tables']['tasks']['Row'], 'title'>
+          setTaskTitle(typedTask.title)
         }
       }
       fetchData()

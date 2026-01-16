@@ -30,8 +30,11 @@ export default async function ClientProjectsPage({
     console.error('Error fetching projects:', error)
   }
 
+  // Type the projects explicitly
+  const typedProjects = (projects || []) as Database['public']['Tables']['projects']['Row'][]
+
   // Filter projects by status if needed
-  let filteredProjects = projects || []
+  let filteredProjects = typedProjects
   if (statusFilter !== 'all') {
     filteredProjects = filteredProjects.filter(
       (p) => p.status === statusFilter
@@ -75,8 +78,8 @@ export default async function ClientProjectsPage({
       />
 
       <ProjectsList 
-        projects={filteredProjects as Array<Database['public']['Tables']['projects']['Row']>}
-        allProjects={projects as Array<Database['public']['Tables']['projects']['Row']> || []}
+        projects={filteredProjects}
+        allProjects={typedProjects}
         initialStatus={statusFilter}
         clientId={profile.id}
       />
