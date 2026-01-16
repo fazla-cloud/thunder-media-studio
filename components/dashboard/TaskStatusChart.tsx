@@ -3,23 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useTheme } from '@/components/theme/ThemeProvider'
+import { getChartColor, getThemeColor } from '@/lib/chart-colors'
 
 interface TaskStatusChartProps {
   data: Array<{ status: string; count: number }>
-}
-
-const statusColorsLight: Record<string, string> = {
-  new: 'hsl(0 0% 100%)',
-  accepted: 'hsl(0 0% 95%)',
-  in_progress: 'hsl(0 0% 90%)',
-  completed: 'hsl(0 0% 95%)',
-}
-
-const statusColorsDark: Record<string, string> = {
-  new: 'hsl(0 0% 5%)',
-  accepted: 'hsl(0 0% 5%)',
-  in_progress: 'hsl(0 0% 10%)',
-  completed: 'hsl(0 0% 5%)',
 }
 
 const statusLabels: Record<string, string> = {
@@ -29,21 +16,29 @@ const statusLabels: Record<string, string> = {
   completed: 'Completed',
 }
 
+// Map statuses to chart color indices
+const statusColorMap: Record<string, number> = {
+  new: 0,           // chart-1 (Royal Blue)
+  accepted: 1,      // chart-2 (Medium Blue)
+  in_progress: 2,   // chart-3 (Muted Periwinkle)
+  completed: 3,     // chart-4 (Vivid Lime Green)
+}
+
 export function TaskStatusChart({ data }: TaskStatusChartProps) {
   const { theme } = useTheme()
   const isDark = theme === 'dark'
-  const statusColors = isDark ? statusColorsDark : statusColorsLight
   
-  const gridColor = isDark ? 'hsl(0 0% 10%)' : 'hsl(0 0% 90%)'
-  const axisColor = isDark ? 'hsl(0 0% 70%)' : 'hsl(0 0% 30%)'
-  const tooltipBg = isDark ? 'hsl(0 0% 5%)' : 'hsl(0 0% 100%)'
-  const tooltipBorder = isDark ? 'hsl(0 0% 10%)' : 'hsl(0 0% 90%)'
+  const gridColor = getThemeColor('--border', isDark, isDark ? 'hsl(228 50% 20%)' : 'hsl(228 60% 75%)')
+  const axisColor = getThemeColor('--muted-foreground', isDark, isDark ? 'hsl(228 30% 70%)' : 'hsl(228 30% 40%)')
+  const tooltipBg = getThemeColor('--card', isDark, isDark ? 'hsl(228 50% 12%)' : 'hsl(0 0% 100%)')
+  const tooltipBorder = getThemeColor('--border', isDark, isDark ? 'hsl(228 50% 20%)' : 'hsl(228 60% 75%)')
+  const tooltipText = getThemeColor('--card-foreground', isDark, isDark ? 'hsl(228 30% 95%)' : 'hsl(228 76% 20%)')
 
   // Always show chart even if all values are 0 - transform data for chart
   const chartData = (data && data.length > 0 ? data : []).map(item => ({
     ...item,
     name: statusLabels[item.status] || item.status,
-    fill: statusColors[item.status] || (isDark ? 'hsl(0 0% 5%)' : 'hsl(0 0% 100%)'),
+    fill: getChartColor(statusColorMap[item.status] ?? 0, isDark),
   }))
 
   return (
@@ -70,7 +65,7 @@ export function TaskStatusChart({ data }: TaskStatusChartProps) {
                 backgroundColor: tooltipBg,
                 border: `1px solid ${tooltipBorder}`,
                 borderRadius: '0.5rem',
-                color: isDark ? 'hsl(0 0% 95%)' : 'hsl(0 0% 5%)',
+                color: tooltipText,
               }}
             />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>

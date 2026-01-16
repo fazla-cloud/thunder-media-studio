@@ -34,10 +34,10 @@ interface UsersManagerProps {
 }
 
 const roleColors: Record<string, string> = {
-  admin: 'bg-primary text-primary-foreground',
-  client: 'bg-muted text-foreground',
-  designer: 'bg-chart-1 text-foreground',
-  marketer: 'bg-chart-2 text-foreground',
+  admin: 'bg-primary text-primary-foreground', // Royal Blue
+  client: 'bg-chart-2 text-primary-foreground', // Medium Blue  
+  designer: 'bg-accent text-accent-foreground', // Vivid Lime Green
+  marketer: 'bg-chart-3 text-primary-foreground dark:text-foreground', // Muted Periwinkle
 }
 
 export function UsersManager({ initialUsers }: UsersManagerProps) {

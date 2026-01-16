@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Thunder (Marketing Agency Platform)",
-  description: "Subscription-based marketing agency platform",
+  title: "Thunder Media Studio",
+  description: "Thunder Media Studio - Creative media production platform",
   icons: {
     icon: '/thunder-logo.svg',
     shortcut: '/thunder-logo.svg',

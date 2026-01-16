@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
+import { useTheme } from '@/components/theme/ThemeProvider'
 
 interface SidebarProps {
   role: 'client' | 'admin' | 'designer' | 'marketer'
@@ -49,6 +50,7 @@ const adminNavItems = [
 
 export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname()
+  const { theme } = useTheme()
   // Determine navigation items based on role
   let roleNavItems: typeof adminNavItems | typeof clientNavItems | typeof designerNavItems | typeof marketerNavItems = clientNavItems
   if (role === 'admin') {
@@ -77,23 +79,15 @@ export function Sidebar({ role }: SidebarProps) {
 
   return (
     <div className="flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar">
-      <Link href="/dashboard" className="flex h-16 items-center gap-3 border-b border-sidebar-border px-6 hover:bg-sidebar-accent/10 transition-colors">
+      <Link href="/dashboard" className="flex h-16 items-center justify-center border-b border-sidebar-border px-4 hover:bg-sidebar-accent/10 transition-colors">
         <Image
-          src="/thunder-logo.svg"
+          src={theme === 'dark' ? '/thunder-logo-transparent-white.svg' : '/thunder-logo-transparent.svg'}
           alt="Thunder Logo"
-          width={28}
-          height={28}
-          className="shrink-0"
+          width={200}
+          height={64}
+          className="w-full h-full object-contain"
           priority
         />
-        <div className="flex flex-col">
-          <h1 className="text-base font-semibold text-sidebar-foreground tracking-tight leading-tight">
-            Thunder
-          </h1>
-          <p className="text-xs text-sidebar-foreground/60 leading-tight">
-            Marketing Agency Platform
-          </p>
-        </div>
       </Link>
       <nav className="flex-1 space-y-1 p-4">
         {navItems.map((item) => {

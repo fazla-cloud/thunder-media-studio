@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { useTheme } from '@/components/theme/ThemeProvider'
+import { getChartColor, getThemeColor } from '@/lib/chart-colors'
 
 interface TasksOverTimeChartProps {
   data: Array<{ date: string; count: number }>
@@ -12,11 +13,12 @@ export function TasksOverTimeChart({ data }: TasksOverTimeChartProps) {
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   
-  const gridColor = isDark ? 'hsl(0 0% 10%)' : 'hsl(0 0% 90%)'
-  const axisColor = isDark ? 'hsl(0 0% 70%)' : 'hsl(0 0% 30%)'
-  const lineColor = isDark ? 'hsl(0 0% 95%)' : 'hsl(0 0% 5%)'
-  const tooltipBg = isDark ? 'hsl(0 0% 5%)' : 'hsl(0 0% 100%)'
-  const tooltipBorder = isDark ? 'hsl(0 0% 10%)' : 'hsl(0 0% 90%)'
+  const gridColor = getThemeColor('--border', isDark, isDark ? 'hsl(228 50% 20%)' : 'hsl(228 60% 75%)')
+  const axisColor = getThemeColor('--muted-foreground', isDark, isDark ? 'hsl(228 30% 70%)' : 'hsl(228 30% 40%)')
+  const lineColor = getChartColor(0, isDark) // Use chart-1 (Royal Blue)
+  const tooltipBg = getThemeColor('--card', isDark, isDark ? 'hsl(228 50% 12%)' : 'hsl(0 0% 100%)')
+  const tooltipBorder = getThemeColor('--border', isDark, isDark ? 'hsl(228 50% 20%)' : 'hsl(228 60% 75%)')
+  const tooltipText = getThemeColor('--card-foreground', isDark, isDark ? 'hsl(228 30% 95%)' : 'hsl(228 76% 20%)')
 
   // Always show chart even if all values are 0
   const chartData = data && data.length > 0 ? data : []
@@ -45,7 +47,7 @@ export function TasksOverTimeChart({ data }: TasksOverTimeChartProps) {
                 backgroundColor: tooltipBg,
                 border: `1px solid ${tooltipBorder}`,
                 borderRadius: '0.5rem',
-                color: isDark ? 'hsl(0 0% 95%)' : 'hsl(0 0% 5%)',
+                color: tooltipText,
               }}
             />
             <Line 

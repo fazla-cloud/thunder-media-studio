@@ -36,6 +36,7 @@ export default function SignupPage() {
         email: data.email,
         password: data.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             full_name: data.fullName,
           },
@@ -44,8 +45,9 @@ export default function SignupPage() {
 
       if (signUpError) throw signUpError
 
-      // Redirect to login after successful signup
-      router.push('/login?message=Account created successfully. Please sign in.')
+      // Redirect to confirmation page after successful signup with email
+      const encodedEmail = encodeURIComponent(data.email)
+      router.push(`/confirm?email=${encodedEmail}&message=Please check your email for a confirmation code and link.`)
     } catch (err: any) {
       setError(err.message || 'Failed to create account')
     } finally {
